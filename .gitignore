@@ -39,3 +39,5 @@ target/
 bills/
 .idea/
 *.iml
+
+src/main/resources/application.properties
