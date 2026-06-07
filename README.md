@@ -1,114 +1,166 @@
-# 🛒 Inventory & Billing System
+# Java Inventory & Billing System
 
-A Java-based Inventory Management and Billing System built using **Spring Boot**, **JDBC**, and **MySQL**. The project provides REST APIs for managing products, tracking inventory, generating bills, calculating GST, and exporting receipts as text files.
+A backend REST API for managing store inventory and generating GST-inclusive bills — built with Core Java, Spring Boot, JDBC, and MySQL.
 
-## 🚀 Features
+---
 
-* Product Management (Add, View, Search, Delete)
-* Category-based Product Organization
-* Inventory Tracking
-* Low Stock Alerts
-* GST Calculation by Product Category
-* Bill Generation
-* Automatic Stock Deduction After Purchase
-* Bill Export to `.txt` File
-* REST API Architecture
-* MySQL Database Integration using JDBC
+## Tech Stack
 
-## 🛠️ Tech Stack
+- **Language:** Java 17
+- **Framework:** Spring Boot 3.2
+- **Database:** MySQL (via JDBC — no ORM)
+- **Build Tool:** Maven
+- **Testing:** Postman
 
-* Java 17
-* Spring Boot
-* JDBC
-* MySQL
-* Maven
-* REST APIs
-* Postman
+---
 
-## 📂 Project Structure
+## What It Does
 
-```text
-src/main/java/com/inventory/billing_system
-├── controller
-├── service
-├── dao
-├── model
-└── BillingSystemApplication.java
+- Add, update, search, and delete products across 3 categories
+- Track real-time stock with configurable low-stock alerts
+- Generate bills with automatic GST calculation per category
+- Export formatted receipts as `.txt` files per transaction
+- Expose all operations via a clean REST API
+
+---
+
+## Project Architecture
+
+```
+Controller → Service → DAO → MySQL
+                 ↓
+           .txt Bill File
 ```
 
-## 📊 Product Categories
+| Layer | Package | Responsibility |
+|---|---|---|
+| Model | `model/` | OOP class hierarchy (abstract `Product` + 3 subclasses) |
+| DAO | `dao/` | All JDBC database operations |
+| Service | `service/` | Business logic, validation, GST calculation |
+| Controller | `controller/` | REST API endpoints |
 
-| Category    | GST |
-| ----------- | --- |
-| Electronics | 18% |
-| Grocery     | 5%  |
-| Clothing    | 12% |
+---
 
-## 🔗 API Endpoints
+## OOP Design — Product Hierarchy
 
-| Method | Endpoint                            | Description        |
-| ------ | ----------------------------------- | ------------------ |
-| GET    | `/api/products`                     | Get all products   |
-| GET    | `/api/products/{id}`                | Get product by ID  |
-| GET    | `/api/products/category/{category}` | Filter by category |
-| GET    | `/api/products/search?keyword=`     | Search products    |
-| GET    | `/api/products/low-stock`           | Low stock alert    |
-| POST   | `/api/products`                     | Add product        |
-| PUT    | `/api/products/{id}/stock`          | Update stock       |
-| DELETE | `/api/products/{id}`                | Delete product     |
-| POST   | `/api/billing/generate`             | Generate bill      |
-
-## ⚙️ Setup
-
-1. Clone the repository
-
-```bash
-git clone <repository-url>
-cd Inventory-Billing-System
+```
+Product  (abstract)
+├── Electronics   → 18% GST
+├── Grocery       → 5%  GST
+└── Clothing      → 12% GST
 ```
 
-2. Create `application.properties` from the example file
+Each subclass implements `getGstRate()` — demonstrating **polymorphism** and **abstraction**.
 
-```bash
-cp src/main/resources/application-example.properties \
-src/main/resources/application.properties
+---
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/products` | Get all products |
+| `GET` | `/api/products/{id}` | Get product by ID (includes GST price) |
+| `GET` | `/api/products/category/{category}` | Filter by ELECTRONICS / GROCERY / CLOTHING |
+| `GET` | `/api/products/search?keyword=` | Search products by name |
+| `GET` | `/api/products/low-stock` | Products below threshold |
+| `POST` | `/api/products` | Add a new product |
+| `PUT` | `/api/products/{id}/stock` | Update stock quantity |
+| `DELETE` | `/api/products/{id}` | Delete a product |
+| `POST` | `/api/billing/generate` | Generate a bill + export `.txt` receipt |
+
+---
+
+## Setup & Run
+
+### 1. Prerequisites
+- Java 17+
+- MySQL running locally
+- Maven
+
+### 2. Database
+```sql
+CREATE DATABASE inventory_db;
+```
+Then run the full SQL script from `src/main/resources/schema.sql`.
+
+### 3. Configure
+Edit `src/main/resources/application.properties`:
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/inventory_db
+spring.datasource.username=root
+spring.datasource.password=your_password
 ```
 
-3. Update your MySQL credentials in `application.properties`
-
-4. Create the database using the provided SQL script
-
-5. Run the application
-
+### 4. Run
 ```bash
 ./mvnw spring-boot:run
 ```
+App starts at `http://localhost:8080`
 
-## 📄 Sample Bill Output
+---
 
-```text
-Bill No : B-20260608-001859
-Date    : 08-Jun-2026
+## Sample Requests
 
-Laptop Stand x2
-Basmati Rice 5kg x1
-
-Subtotal : 1518.00
-GST      : 231.64
-
-GRAND TOTAL : 1749.64
+**Add a product**
+```json
+POST /api/products
+{
+  "name": "Wireless Mouse",
+  "category": "ELECTRONICS",
+  "price": 799,
+  "stock": 30,
+  "threshold": 5
+}
 ```
 
-## 🎯 Learning Outcomes
+**Generate a bill**
+```json
+POST /api/billing/generate
+[
+  { "productId": 1, "quantity": 2 },
+  { "productId": 5, "quantity": 1 }
+]
+```
 
-* Object-Oriented Programming
-* Spring Boot REST APIs
-* JDBC Database Connectivity
-* Maven Project Management
-* Layered Architecture (Controller → Service → DAO → Database)
-* File Handling in Java
-* Inventory & Billing Workflows
+**Response:**
+```json
+{
+  "success": true,
+  "billNumber": "B-20240528-143022",
+  "subtotal": "1518.00",
+  "totalGst": "288.60",
+  "grandTotal": "1806.60",
+  "billFile": "bills/B-20240528-143022.txt"
+}
+```
 
-## 👨‍💻 Author
+---
 
-**Shivam Pal**
+## Sample Bill Output
+
+```
+=======================================================
+          INVENTORY & BILLING SYSTEM
+=======================================================
+  Bill No  : B-20240528-143022
+  Date     : 28-May-2024  14:30:22
+-------------------------------------------------------
+  Product                Qty    Price      Total
+-------------------------------------------------------
+  Wireless Mouse           2   799.00    1886.44
+                                GST @18%:   288.44
+  Basmati Rice 5kg         1   320.00     336.00
+                                GST @5%:     16.00
+-------------------------------------------------------
+  Subtotal (excl. GST)          :      1918.00
+  Total GST                     :       304.44
+=======================================================
+  GRAND TOTAL                   :      2222.44
+=======================================================
+```
+
+---
+
+## Author
+
+**Shivam Pal** — [LinkedIn](https://linkedin.com/in/shivampal) · [GitHub](https://github.com/shivampal)
