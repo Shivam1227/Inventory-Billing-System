@@ -7,7 +7,7 @@ A backend REST API for managing store inventory and generating GST-inclusive bil
 ## Tech Stack
 
 - **Language:** Java 17
-- **Framework:** Spring Boot 3.2
+- **Framework:** Spring Boot 3.2.5
 - **Database:** MySQL (via JDBC — no ORM)
 - **Build Tool:** Maven
 - **Testing:** Postman
@@ -84,12 +84,12 @@ CREATE DATABASE inventory_db;
 Then run the full SQL script from `src/main/resources/schema.sql`.
 
 ### 3. Configure
-Edit `src/main/resources/application.properties`:
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/inventory_db
-spring.datasource.username=root
-spring.datasource.password=your_password
+Copy the example properties file and fill in your password:
+```bash
+cp src/main/resources/application-example.properties \
+   src/main/resources/application.properties
 ```
+Then edit `application.properties` with your MySQL password.
 
 ### 4. Run
 ```bash
@@ -139,28 +139,32 @@ POST /api/billing/generate
 ## Sample Bill Output
 
 ```
-=======================================================
-          INVENTORY & BILLING SYSTEM
-=======================================================
-  Bill No  : B-20240528-143022
-  Date     : 28-May-2024  14:30:22
--------------------------------------------------------
-  Product                Qty    Price      Total
--------------------------------------------------------
-  Wireless Mouse           2   799.00    1886.44
-                                GST @18%:   288.44
-  Basmati Rice 5kg         1   320.00     336.00
-                                GST @5%:     16.00
--------------------------------------------------------
-  Subtotal (excl. GST)          :      1918.00
-  Total GST                     :       304.44
-=======================================================
-  GRAND TOTAL                   :      2222.44
-=======================================================
+============================================================
+              INVENTORY & BILLING SYSTEM
+                  All In One Store
+============================================================
+Bill No : B-20260608-003616
+Date    : 08-Jun-2026 00:36:16
+------------------------------------------------------------
+Product                   Qty   Price      Total     
+------------------------------------------------------------
+Bluetooth Speaker         2     1299.00    3065.64   
+   GST @ 18% : 467.64
+Sports Shoes              1     1899.00    2126.88   
+   GST @ 12% : 227.88
+------------------------------------------------------------
+Subtotal (Excl. GST)                        4497.00
+Total GST                                    695.52
+============================================================
+GRAND TOTAL                                 5192.52
+============================================================
+         Thank You For Your Purchase!
+============================================================
+
 ```
 
 ---
 
 ## Author
 
-**Shivam Pal** — [LinkedIn](https://linkedin.com/in/shivampal) · [GitHub](https://github.com/shivampal)
+**Shivam Pal** — [LinkedIn](https://www.linkedin.com/in/shivam-pal-a8408b290/) · [GitHub](https://github.com/Shivam1227)
